@@ -22,19 +22,23 @@ def descargar(url, carpeta, formato='mp3', calidad='mejor', al_progresar=None):
     import yt_dlp
 
     avisar = al_progresar or (lambda fase, pct: None)
-    vistos = []  # archivos que yt-dlp ya empezó (video y audio van por separado en MP4)
+    partes = 1   # en MP4 suelen ser 2 (video y audio por separado); se sabe tras consultar el video
+    vistos = []  # archivos que yt-dlp ya empezó, en orden
 
     def gancho_descarga(d):
-        partes = len((d.get('info_dict') or {}).get('requested_formats') or []) or 1
+        if d['status'] != 'downloading':
+            return
         nombre = d.get('filename')
         if nombre not in vistos:
             vistos.append(nombre)
         indice = min(vistos.index(nombre), partes - 1)
-        if d['status'] == 'downloading':
-            total = d.get('total_bytes') or d.get('total_bytes_estimate')
-            fraccion = (d.get('downloaded_bytes') or 0) / total if total else 0
-            avisar('descargando', round((indice + min(fraccion, 1)) / partes * 100, 1))
-        elif d['status'] == 'finished' and indice == partes - 1:
+        total = d.get('total_bytes') or d.get('total_bytes_estimate')
+        fraccion = (d.get('downloaded_bytes') or 0) / total if total else 0
+        avisar('descargando', round((indice + min(fraccion, 1)) / partes * 100, 1))
+
+    def gancho_ffmpeg(d):
+        # Unir video+audio o convertir a MP3: ffmpeg no da porcentaje
+        if d['status'] == 'started' and d.get('postprocessor') in ('Merger', 'ExtractAudio'):
             avisar('convirtiendo', None)
 
     opciones = {
@@ -45,6 +49,7 @@ def descargar(url, carpeta, formato='mp3', calidad='mejor', al_progresar=None):
         'no_warnings': True,
         'noprogress': True,
         'progress_hooks': [gancho_descarga],
+        'postprocessor_hooks': [gancho_ffmpeg],
     }
     cookies = Path(__file__).with_name('cookies.txt')
     if cookies.exists():
@@ -68,7 +73,9 @@ def descargar(url, carpeta, formato='mp3', calidad='mejor', al_progresar=None):
         opciones['merge_output_format'] = 'mp4'
 
     with yt_dlp.YoutubeDL(opciones) as ydl:
-        info = ydl.extract_info(url, download=True)
+        info = ydl.extract_info(url, download=False)
+        partes = len(info.get('requested_formats') or []) or 1
+        info = ydl.process_ie_result(info, download=True)
         ruta = info['requested_downloads'][0]['filepath']
     return info.get('title') or 'video', ruta
 

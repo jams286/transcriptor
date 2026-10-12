@@ -39,6 +39,7 @@ Fuera de esa carpeta sigue aplicando la regla global: no tocar nada más de `/me
 
 - Página: `rsync -a --delete ~/proyectos/personal/transcriptor/web/ /var/www/transcriptor/`
 - Servicio: `systemctl --user restart transcriptor` / `journalctl --user -u transcriptor -f`
+- Instalar dependencias: `python3 -m venv .venv && .venv/bin/pip install -r requirements.txt` (`av` va fijo, ver comentario en requirements.txt).
 - Actualizar yt-dlp cuando un sitio deje de funcionar: `.venv/bin/pip install -U yt-dlp` y reiniciar el servicio.
 - Ojo: el sistema trae un `yt_dlp` viejo (2024) en `/usr/lib/python3/dist-packages`; usar siempre el de `.venv/`.
 

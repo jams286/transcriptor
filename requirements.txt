@@ -1,0 +1,5 @@
+# yt-dlp sin fijar: hay que actualizarlo seguido porque los sitios cambian
+yt-dlp
+faster-whisper==1.2.1
+# av 19 quitó el parámetro metadata_errors que usa faster-whisper 1.2.1 (TypeError en decode_audio)
+av==18.1.0
