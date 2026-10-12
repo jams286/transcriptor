@@ -15,6 +15,9 @@
 
 *, *::before, *::after { box-sizing: border-box; }
 
+/* Lo que la página oculta debe ocultarse aunque su clase le dé display */
+[hidden] { display: none !important; }
+
 body {
   margin: 0;
   background: var(--fondo);
