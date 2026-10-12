@@ -85,7 +85,66 @@ def descargar(url, carpeta, formato='mp3', calidad='mejor', compatibilidad='comp
         partes = len(info.get('requested_formats') or []) or 1
         info = ydl.process_ie_result(info, download=True)
         ruta = info['requested_downloads'][0]['filepath']
+
+    if formato == 'mp4' and compatibilidad == 'compatible':
+        hacer_compatible(ruta, lambda pct: avisar('recodificando', pct))
     return info.get('title') or 'video', ruta
+
+
+def _sonda(ruta):
+    """Devuelve (códec de video, códec de audio, duración en s) usando ffprobe."""
+    import json
+    import subprocess
+
+    salida = subprocess.run(
+        ['ffprobe', '-v', 'error', '-show_entries', 'stream=codec_type,codec_name:format=duration',
+         '-of', 'json', str(ruta)], capture_output=True, text=True, check=True).stdout
+    datos = json.loads(salida)
+    codecs = {s['codec_type']: s['codec_name'] for s in reversed(datos.get('streams', []))}
+    return codecs.get('video'), codecs.get('audio'), float(datos.get('format', {}).get('duration') or 0)
+
+
+def hacer_compatible(ruta, al_progresar=None):
+    """Si el MP4 no es H.264 + AAC, lo convierte en el mismo lugar. Devuelve True si convirtió.
+
+    Hace falta cuando el sitio no ofrece H.264 (iPhone anteriores al 15 Pro no ven AV1/VP9).
+    al_progresar(porcentaje) va de 0 a 100.
+    """
+    import subprocess
+
+    video, audio, duracion = _sonda(ruta)
+    if video in ('h264', None) and audio in ('aac', None):
+        return False
+
+    avisar = al_progresar or (lambda pct: None)
+    avisar(0)
+    temporal = Path(ruta).with_suffix('.convirtiendo.mp4')
+    comando = ['ffmpeg', '-y', '-v', 'error', '-nostats', '-progress', 'pipe:1', '-i', str(ruta)]
+    if video and video != 'h264':
+        comando += ['-c:v', 'libx264', '-preset', 'veryfast', '-crf', '21', '-pix_fmt', 'yuv420p']
+    else:
+        comando += ['-c:v', 'copy']
+    if audio and audio != 'aac':
+        comando += ['-c:a', 'aac', '-b:a', '160k']
+    else:
+        comando += ['-c:a', 'copy']
+    comando += ['-movflags', '+faststart', str(temporal)]
+
+    proceso = subprocess.Popen(comando, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+    for linea in proceso.stdout:  # ffmpeg -progress manda "clave=valor" por línea
+        if linea.startswith('out_time_us=') and duracion:
+            try:
+                segundos = int(linea.split('=', 1)[1]) / 1_000_000
+            except ValueError:
+                continue  # "N/A" al principio
+            avisar(round(min(segundos / duracion, 1) * 100, 1))
+    errores = proceso.stderr.read()
+    if proceso.wait() != 0:
+        temporal.unlink(missing_ok=True)
+        raise RuntimeError(f'No se pudo convertir el video a H.264: {errores.strip()[-300:]}')
+    temporal.replace(ruta)
+    avisar(100)
+    return True
 
 
 def transcribir(ruta_audio, ruta_txt, idioma=None, modelo='rapido', al_progresar=None):

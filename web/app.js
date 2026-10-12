@@ -3,7 +3,7 @@
   'use strict';
 
   const API = 'api/trabajos';
-  const ACTIVOS = ['en_cola', 'descargando', 'convirtiendo', 'transcribiendo'];
+  const ACTIVOS = ['en_cola', 'descargando', 'convirtiendo', 'recodificando', 'transcribiendo'];
   const IDIOMAS = {
     es: 'español', en: 'inglés', pt: 'portugués', fr: 'francés', de: 'alemán', it: 'italiano',
     ja: 'japonés', ko: 'coreano', zh: 'chino', ru: 'ruso', ar: 'árabe', hi: 'hindi',
@@ -118,6 +118,7 @@
       case 'en_cola': return 'En espera: empieza cuando termine la descarga anterior.';
       case 'descargando': return 'Descargando…';
       case 'convirtiendo': return t.formato === 'mp3' ? 'Convirtiendo a MP3…' : 'Uniendo video y audio…';
+      case 'recodificando': return 'Convirtiendo para que se vea en cualquier celular…';
       case 'transcribiendo': return 'Transcribiendo…';
       case 'listo':
         return t.transcribir && t.idioma_detectado
@@ -151,6 +152,9 @@
       const convirtiendo = t.estado === 'convirtiendo';
       barras += barra('descarga', t.formato === 'mp4' ? 'Video' : 'Audio',
         t.progreso_descarga, convirtiendo ? 'indefinida' : '');
+      if (t.estado === 'recodificando') {
+        barras += barra('descarga', 'Conversión', t.progreso_conversion);
+      }
       if (t.transcribir) {
         barras += barra('texto', 'Transcripción', t.progreso_transcripcion,
           t.estado === 'transcribiendo' ? '' : 'espera');
@@ -185,7 +189,7 @@
     let anterior = null;
     for (const t of trabajos) {
       const firma = JSON.stringify([t.estado, t.titulo, Math.round(t.progreso_descarga),
-        Math.round(t.progreso_transcripcion), t.archivos, t.error, confirmando.has(t.id)]);
+        Math.round(t.progreso_transcripcion), Math.round(t.progreso_conversion || 0), t.archivos, t.error, confirmando.has(t.id)]);
       let li = existentes.get(t.id);
       existentes.delete(t.id);
       if (!li) {

@@ -10,7 +10,7 @@ Fuera de esa carpeta sigue aplicando la regla global: no tocar nada más de `/me
 ## Requisitos acordados
 
 - Formatos: MP3 (por defecto) o MP4 con calidad: mejor / 1080p / 720p / 480p (limita el lado corto, para que los verticales salgan bien).
-- Compatibilidad del MP4: "compatible" (por defecto, H.264+AAC, hasta 1080p en YouTube, se ve en cualquier iPhone) o "maxima" (AV1/VP9, hasta 4K; iPhone anteriores al 15 Pro lo ven negro).
+- Compatibilidad del MP4: "compatible" (por defecto, H.264+AAC, hasta 1080p en YouTube, se ve en cualquier iPhone) o "maxima" (AV1/VP9, hasta 4K; iPhone anteriores al 15 Pro lo ven negro). Si en modo compatible el sitio no da H.264+AAC, `motor.hacer_compatible` lo convierte con ffmpeg (estado `recodificando`, barra "Conversión").
 - Transcripción solo disponible con MP3 (casilla deshabilitada con MP4). Salida .txt.
 - Idioma: automático o elegido de una lista.
 - Modelo: "rápido" = `small` (por defecto), "preciso" = `medium`. Motor: faster-whisper (CPU, int8).

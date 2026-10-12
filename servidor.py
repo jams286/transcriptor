@@ -24,6 +24,7 @@ import motor
 HOST, PUERTO = '127.0.0.1', 8765
 RAIZ = Path('/media/datos/transcriptor/trabajos')
 
+EN_PROCESO = ('descargando', 'convirtiendo', 'recodificando', 'transcribiendo')
 IDIOMAS = {'es', 'en', 'pt', 'fr', 'de', 'it', 'ja', 'ko', 'zh', 'ru', 'ar', 'hi'}
 
 trabajos = {}            # id -> dict
@@ -53,7 +54,7 @@ def cargar_historial():
             t = json.loads(f.read_text(encoding='utf-8'))
         except (OSError, ValueError):
             continue
-        if t['estado'] in ('descargando', 'convirtiendo', 'transcribiendo'):
+        if t['estado'] in EN_PROCESO:
             t.update(estado='error', error='Se interrumpió porque el servicio se reinició. Vuelve a pedirlo.')
             guardar(t)
         trabajos[t['id']] = t
@@ -81,6 +82,11 @@ def procesar(t):
     def al_descargar(fase, pct):
         if fase == 'convirtiendo':
             actualizar(t, estado='convirtiendo', progreso_descarga=100)
+        elif fase == 'recodificando':
+            # El sitio no dio H.264: ffmpeg lo convierte para que se vea en cualquier celular
+            if t['estado'] != 'recodificando':
+                actualizar(t, estado='recodificando', progreso_descarga=100)
+            progreso('progreso_conversion', pct)
         else:
             if t['estado'] != 'descargando':
                 actualizar(t, estado='descargando')
@@ -164,6 +170,7 @@ def nuevo_trabajo(datos):
         'titulo': None,
         'progreso_descarga': 0,
         'progreso_transcripcion': 0,
+        'progreso_conversion': None,
         'archivos': [],
         'error': None,
     }
@@ -225,7 +232,7 @@ class Manejador(BaseHTTPRequestHandler):
             t = trabajos.get(p[2])
             if not t:
                 return self.responder(404, {'error': 'No existe ese trabajo.'})
-            if t['estado'] in ('descargando', 'convirtiendo', 'transcribiendo'):
+            if t['estado'] in EN_PROCESO:
                 return self.responder(409, {'error': 'Está en proceso. Espera a que termine para borrarlo.'})
             del trabajos[p[2]]
         shutil.rmtree(RAIZ / p[2], ignore_errors=True)
