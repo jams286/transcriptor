@@ -1,0 +1,14 @@
+[Unit]
+Description=Transcriptor (descarga y transcripción de videos)
+After=network-online.target
+
+[Service]
+WorkingDirectory=%h/proyectos/personal/transcriptor
+ExecStart=%h/proyectos/personal/transcriptor/.venv/bin/python servidor.py
+Restart=on-failure
+RestartSec=5
+# La transcripción usa todos los núcleos; que no le gane al resto del server
+Nice=10
+
+[Install]
+WantedBy=default.target

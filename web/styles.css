@@ -1,0 +1,308 @@
+:root {
+  --fondo: #e9eff3;
+  --superficie: #ffffff;
+  --tinta: #17262f;
+  --tinta-suave: #546874;
+  --linea: #cfdae1;
+  --descarga: #0d7a80;
+  --texto: #4a4fc4;
+  --error: #b42318;
+  --error-fondo: #fdecea;
+
+  --letra: "Atkinson Hyperlegible", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --radio-control: 10px;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--fondo);
+  color: var(--tinta);
+  font-family: var(--letra);
+  font-size: 1.0625rem;
+  line-height: 1.45;
+  -webkit-font-smoothing: antialiased;
+}
+
+.pagina {
+  max-width: 34rem;
+  margin: 0 auto;
+  padding: 1.75rem 1rem 4rem;
+}
+
+h1 {
+  font-size: 2rem;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  margin: 0 0 1.25rem;
+}
+
+h2 {
+  font-size: 1.25rem;
+  margin: 0 0 0.75rem;
+}
+
+/* ---------- Formulario ---------- */
+
+.pedido {
+  background: var(--superficie);
+  border-radius: 16px;
+  padding: 1.25rem;
+  display: grid;
+  gap: 1.15rem;
+}
+
+.etiqueta {
+  display: block;
+  font-weight: 700;
+  font-size: 0.95rem;
+  margin-bottom: 0.4rem;
+  padding: 0;
+}
+
+fieldset { border: 0; margin: 0; padding: 0; min-width: 0; }
+
+input[type="url"], select {
+  width: 100%;
+  font: inherit;
+  color: inherit;
+  background: var(--fondo);
+  border: 2px solid transparent;
+  border-radius: var(--radio-control);
+  padding: 0.8rem 0.9rem;
+}
+input[type="url"]:focus, select:focus {
+  outline: none;
+  border-color: var(--descarga);
+  background: var(--superficie);
+}
+input[type="url"]::placeholder { color: #8396a1; }
+
+/* Botones segmentados: radios de verdad, solo cambia cómo se ven */
+.segmentos {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+.segmentos label { flex: 1 1 auto; }
+.segmentos input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+.segmentos span {
+  display: block;
+  text-align: center;
+  padding: 0.65rem 0.8rem;
+  border-radius: var(--radio-control);
+  border: 2px solid var(--linea);
+  cursor: pointer;
+  white-space: nowrap;
+}
+.segmentos input:checked + span {
+  border-color: var(--tinta);
+  background: var(--tinta);
+  color: var(--superficie);
+}
+.segmentos input:focus-visible + span { outline: 3px solid var(--descarga); outline-offset: 2px; }
+
+.casilla {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  cursor: pointer;
+  font-weight: 700;
+}
+.casilla input {
+  width: 1.4rem;
+  height: 1.4rem;
+  margin: 0;
+  accent-color: var(--texto);
+  flex: none;
+}
+.casilla:has(input:disabled) { color: var(--tinta-suave); cursor: not-allowed; }
+
+.opciones-texto {
+  display: grid;
+  gap: 1.15rem;
+  padding-left: 1rem;
+  border-left: 3px solid var(--texto);
+}
+
+.nota {
+  margin: 0.4rem 0 0;
+  font-size: 0.9rem;
+  color: var(--tinta-suave);
+}
+
+.aviso {
+  margin: 0;
+  padding: 0.7rem 0.9rem;
+  border-radius: var(--radio-control);
+  background: var(--error-fondo);
+  color: var(--error);
+}
+
+.boton-principal {
+  font: inherit;
+  font-weight: 700;
+  font-size: 1.1rem;
+  border: 0;
+  border-radius: 12px;
+  padding: 0.95rem 1rem;
+  background: var(--descarga);
+  color: #fff;
+  cursor: pointer;
+}
+.boton-principal:active { transform: translateY(1px); }
+.boton-principal:disabled { opacity: 0.6; cursor: wait; }
+.boton-principal:focus-visible { outline: 3px solid var(--tinta); outline-offset: 3px; }
+
+/* ---------- Historial ---------- */
+
+.historial { margin-top: 2.25rem; }
+
+.vacio { color: var(--tinta-suave); margin: 0; }
+
+.trabajos {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.trabajo {
+  padding: 1rem 0;
+  border-top: 1px solid var(--linea);
+}
+.trabajo:first-child { border-top: 0; }
+
+/* El que está en marcha se destaca; los terminados quedan como lista simple */
+.trabajo.activo {
+  background: var(--superficie);
+  border-radius: 14px;
+  padding: 1rem;
+  margin-bottom: 0.5rem;
+  border-top: 0;
+}
+.trabajo.activo + .trabajo { border-top: 0; }
+
+.trabajo-titulo {
+  font-weight: 700;
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+.trabajo-detalle {
+  margin: 0.15rem 0 0;
+  font-size: 0.9rem;
+  color: var(--tinta-suave);
+  overflow-wrap: anywhere;
+}
+
+.estado {
+  margin: 0.75rem 0 0.35rem;
+  font-size: 0.95rem;
+}
+.estado.error { color: var(--error); }
+
+/* ---------- Barras de progreso ---------- */
+
+.barra {
+  display: grid;
+  grid-template-columns: 1fr 3.2rem;
+  align-items: center;
+  gap: 0.6rem;
+  margin-top: 0.45rem;
+}
+.barra-nombre {
+  grid-column: 1 / -1;
+  font-size: 0.85rem;
+  color: var(--tinta-suave);
+  margin-bottom: -0.3rem;
+}
+.barra-pista {
+  height: 14px;
+  border-radius: 7px;
+  background: var(--fondo);
+  overflow: hidden;
+}
+.barra-relleno {
+  height: 100%;
+  width: 0;
+  border-radius: 7px;
+  transition: width 0.4s ease;
+}
+.barra-numero {
+  font-size: 0.9rem;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.barra.descarga .barra-relleno { background: var(--descarga); }
+
+/* La transcripción se llena con "renglones": trazos cortos como palabras */
+.barra.texto .barra-relleno {
+  background-color: var(--texto);
+  background-image:
+    repeating-linear-gradient(90deg,
+      rgba(255,255,255,0.55) 0 14px, transparent 14px 18px,
+      rgba(255,255,255,0.55) 18px 26px, transparent 26px 30px,
+      rgba(255,255,255,0.55) 30px 49px, transparent 49px 54px);
+  background-size: 54px 3px;
+  background-repeat: repeat-x;
+  background-position: 0 center;
+}
+
+/* Conversión con ffmpeg: no hay porcentaje, se mueve un tramo */
+.barra.indefinida .barra-relleno {
+  width: 35% !important;
+  animation: vaiven 1.3s ease-in-out infinite alternate;
+}
+@keyframes vaiven {
+  from { transform: translateX(-10%); }
+  to   { transform: translateX(200%); }
+}
+
+.barra.espera .barra-relleno { width: 0; }
+
+/* ---------- Acciones ---------- */
+
+.acciones {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.8rem;
+}
+
+.boton {
+  font: inherit;
+  font-size: 0.95rem;
+  font-weight: 700;
+  text-decoration: none;
+  border-radius: var(--radio-control);
+  padding: 0.6rem 0.95rem;
+  cursor: pointer;
+  border: 2px solid transparent;
+  display: inline-block;
+}
+.boton:focus-visible { outline: 3px solid var(--descarga); outline-offset: 2px; }
+
+.boton-bajar { background: var(--descarga); color: #fff; }
+.boton-bajar.txt { background: var(--texto); }
+
+.boton-borrar {
+  background: transparent;
+  color: var(--tinta-suave);
+  border-color: var(--linea);
+  margin-left: auto;
+}
+.boton-borrar.confirmar {
+  background: var(--error);
+  border-color: var(--error);
+  color: #fff;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .barra-relleno { transition: none; }
+  .barra.indefinida .barra-relleno { animation: none; width: 100% !important; opacity: 0.45; }
+}

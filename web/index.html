@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#e9eff3">
+  <title>Transcriptor</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&display=swap">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <main class="pagina">
+    <h1>Transcriptor</h1>
+
+    <form id="formulario" class="pedido" novalidate>
+      <label class="campo-url">
+        <span class="etiqueta">Enlace del video</span>
+        <input type="url" id="url" name="url" inputmode="url" autocomplete="off"
+               placeholder="https://www.youtube.com/watch?v=…" required>
+      </label>
+
+      <fieldset class="grupo">
+        <legend class="etiqueta">Formato</legend>
+        <div class="segmentos">
+          <label><input type="radio" name="formato" value="mp3" checked><span>Audio MP3</span></label>
+          <label><input type="radio" name="formato" value="mp4"><span>Video MP4</span></label>
+        </div>
+      </fieldset>
+
+      <fieldset class="grupo" id="grupo-calidad" hidden>
+        <legend class="etiqueta">Calidad del video</legend>
+        <div class="segmentos">
+          <label><input type="radio" name="calidad" value="mejor" checked><span>La mejor</span></label>
+          <label><input type="radio" name="calidad" value="1080"><span>1080p</span></label>
+          <label><input type="radio" name="calidad" value="720"><span>720p</span></label>
+          <label><input type="radio" name="calidad" value="480"><span>480p</span></label>
+        </div>
+      </fieldset>
+
+      <div class="grupo" id="grupo-transcribir">
+        <label class="casilla">
+          <input type="checkbox" id="transcribir" name="transcribir">
+          <span>Transcribir el audio a texto</span>
+        </label>
+        <p class="nota" id="nota-mp4" hidden>La transcripción solo está disponible con audio MP3.</p>
+      </div>
+
+      <div class="opciones-texto" id="opciones-texto" hidden>
+        <label class="grupo">
+          <span class="etiqueta">Idioma del video</span>
+          <select id="idioma" name="idioma">
+            <option value="auto">Detectarlo solo</option>
+            <option value="es">Español</option>
+            <option value="en">Inglés</option>
+            <option value="pt">Portugués</option>
+            <option value="fr">Francés</option>
+            <option value="de">Alemán</option>
+            <option value="it">Italiano</option>
+            <option value="ja">Japonés</option>
+            <option value="ko">Coreano</option>
+            <option value="zh">Chino</option>
+            <option value="ru">Ruso</option>
+            <option value="ar">Árabe</option>
+            <option value="hi">Hindi</option>
+          </select>
+        </label>
+
+        <fieldset class="grupo">
+          <legend class="etiqueta">Transcripción</legend>
+          <div class="segmentos">
+            <label><input type="radio" name="modelo" value="rapido" checked><span>Rápida</span></label>
+            <label><input type="radio" name="modelo" value="preciso"><span>Más precisa</span></label>
+          </div>
+          <p class="nota">La más precisa tarda unas tres veces más.</p>
+        </fieldset>
+      </div>
+
+      <p class="aviso" id="aviso" role="alert" hidden></p>
+      <button type="submit" class="boton-principal" id="enviar">Descargar audio</button>
+    </form>
+
+    <section class="historial" aria-labelledby="titulo-historial">
+      <h2 id="titulo-historial">Descargas</h2>
+      <p class="vacio" id="vacio" hidden>Todavía no hay descargas. Pega un enlace arriba para empezar.</p>
+      <ol class="trabajos" id="trabajos"></ol>
+    </section>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>
