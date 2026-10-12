@@ -34,7 +34,7 @@ Fuera de esa carpeta sigue aplicando la regla global: no tocar nada más de `/me
   - `GET /api/trabajos`, `POST /api/trabajos`, `GET /api/trabajos/<id>`, `DELETE /api/trabajos/<id>`, `GET /api/trabajos/<id>/archivo/<nombre>`.
 - `web/`: página estática (sondea la API cada 1 s si hay trabajos activos, si no cada 15 s). Ícono: `favicon.svg` es el original; los PNG (32, 180 para iPhone, 192/512 para Android) se generaron de él con Pillow.
 - `servicio/transcriptor.service`: unidad systemd de usuario.
-- `cookies.txt` (opcional, fuera de git): si existe, yt-dlp lo usa (Instagram/X).
+- `cookies.txt` (fuera de git, permisos 600): cookies de x.com e instagram.com; yt-dlp lo usa en cada descarga. Cuando caduquen: en la PC, extensión "Get cookies.txt LOCALLY" → "Export" estando en el sitio (NO "Export All", que saca las sesiones de todos los sitios). Si llega una exportación completa, filtrar solo esos dominios y pedir a Jams que borre el original.
 
 ## Publicar y operar
 
