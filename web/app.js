@@ -13,6 +13,7 @@
   const form = $('#formulario');
   const urlInput = $('#url');
   const grupoCalidad = $('#grupo-calidad');
+  const grupoCompatibilidad = $('#grupo-compatibilidad');
   const transcribir = $('#transcribir');
   const notaMp4 = $('#nota-mp4');
   const opcionesTexto = $('#opciones-texto');
@@ -30,6 +31,7 @@
   function ajustarFormulario() {
     const esVideo = formato() === 'mp4';
     grupoCalidad.hidden = !esVideo;
+    grupoCompatibilidad.hidden = !esVideo;
     transcribir.disabled = esVideo;
     if (esVideo) transcribir.checked = false;
     notaMp4.hidden = !esVideo;
@@ -63,6 +65,7 @@
           url,
           formato: formato(),
           calidad: form.calidad.value,
+          compatibilidad: form.compatibilidad.value,
           transcribir: transcribir.checked,
           idioma: form.idioma.value,
           modelo: form.modelo.value,
@@ -97,6 +100,9 @@
     const partes = [];
     if (t.formato === 'mp4') {
       partes.push(t.calidad === 'mejor' ? 'Video MP4 en la mejor calidad' : `Video MP4 en ${t.calidad}p`);
+      if (t.compatibilidad) {
+        partes.push(t.compatibilidad === 'maxima' ? 'para equipos recientes' : 'para cualquier celular o PC');
+      }
     } else if (t.transcribir) {
       const idioma = t.idioma ? IDIOMAS[t.idioma] : 'idioma automático';
       partes.push(`Audio MP3 con transcripción ${t.modelo === 'preciso' ? 'precisa' : 'rápida'} (${idioma})`);

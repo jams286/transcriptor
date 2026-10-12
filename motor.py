@@ -8,14 +8,18 @@ import os
 from pathlib import Path
 
 CALIDADES = {'mejor': None, '1080': 1080, '720': 720, '480': 480}
+# compatible: H.264 (se ve en cualquier iPhone/Android/PC, hasta 1080p en YouTube)
+# maxima: AV1/VP9 (más calidad y hasta 4K; iPhone anteriores al 15 Pro lo ven negro)
+COMPATIBILIDADES = ('compatible', 'maxima')
 MODELOS = {'rapido': 'small', 'preciso': 'medium'}
 
 _modelos_cargados = {}
 
 
-def descargar(url, carpeta, formato='mp3', calidad='mejor', al_progresar=None):
+def descargar(url, carpeta, formato='mp3', calidad='mejor', compatibilidad='compatible', al_progresar=None):
     """Descarga `url` en `carpeta` y devuelve (titulo, ruta_del_archivo).
 
+    La calidad limita el lado corto del video (un short vertical en 720p sale 720x1280).
     al_progresar(fase, porcentaje) recibe fase 'descargando' (0-100) o
     'convirtiendo' (None: sin porcentaje, lo hace ffmpeg).
     """
@@ -63,13 +67,17 @@ def descargar(url, carpeta, formato='mp3', calidad='mejor', al_progresar=None):
             'preferredquality': '192',
         }]
     else:
-        alto = CALIDADES.get(calidad)
-        limite = f'[height<={alto}]' if alto else ''
-        # Preferir pistas que ya son MP4/M4A para no recodificar.
-        opciones['format'] = (
-            f'bestvideo{limite}[ext=mp4]+bestaudio[ext=m4a]/'
-            f'bestvideo{limite}+bestaudio/best{limite}/best'
-        )
+        lado = CALIDADES.get(calidad)
+        # 'res' de yt-dlp es el lado corto: res:720 = lo más grande que no pase de 720
+        orden = [f'res:{lado}'] if lado else ['res']
+        if compatibilidad == 'compatible':
+            # H.264 + AAC; si el sitio no tiene H.264, lo mejor que haya
+            opciones['format'] = 'bv*[vcodec^=avc1]+ba[acodec^=mp4a]/b[vcodec^=avc1]/bv*+ba/b'
+            orden += ['vcodec:h264', 'acodec:aac']
+        else:
+            opciones['format'] = 'bv*+ba/b'
+            orden += ['vcodec', 'acodec:aac']  # vcodec sin límite: AV1 > VP9 > H.265 > H.264
+        opciones['format_sort'] = orden
         opciones['merge_output_format'] = 'mp4'
 
     with yt_dlp.YoutubeDL(opciones) as ydl:
@@ -111,6 +119,7 @@ if __name__ == '__main__':
     p.add_argument('url')
     p.add_argument('formato', nargs='?', default='mp3', choices=['mp3', 'mp4'])
     p.add_argument('--calidad', default='mejor', choices=list(CALIDADES))
+    p.add_argument('--compatibilidad', default='compatible', choices=COMPATIBILIDADES)
     p.add_argument('--transcribir', action='store_true')
     p.add_argument('--idioma', default=None)
     p.add_argument('--modelo', default='rapido', choices=list(MODELOS))
@@ -118,7 +127,7 @@ if __name__ == '__main__':
     a = p.parse_args()
 
     Path(a.carpeta).mkdir(parents=True, exist_ok=True)
-    titulo, ruta = descargar(a.url, a.carpeta, a.formato, a.calidad,
+    titulo, ruta = descargar(a.url, a.carpeta, a.formato, a.calidad, a.compatibilidad,
                              lambda fase, pct: print(f'\r{fase} {pct if pct is not None else ""}%   ', end='', flush=True))
     print(f'\nDescargado: {ruta}')
     if a.transcribir and a.formato == 'mp3':

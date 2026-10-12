@@ -87,7 +87,8 @@ def procesar(t):
             progreso('progreso_descarga', pct)
 
     actualizar(t, estado='descargando', progreso_descarga=0)
-    titulo, ruta = motor.descargar(t['url'], carpeta, t['formato'], t['calidad'], al_descargar)
+    titulo, ruta = motor.descargar(t['url'], carpeta, t['formato'], t['calidad'],
+                                   t.get('compatibilidad') or 'compatible', al_progresar=al_descargar)
     archivos = [Path(ruta).name]
     actualizar(t, titulo=titulo, progreso_descarga=100, archivos=list(archivos))
 
@@ -141,6 +142,9 @@ def nuevo_trabajo(datos):
         idioma = None
     if idioma and idioma not in IDIOMAS:
         raise ValueError('Idioma no válido.')
+    compatibilidad = datos.get('compatibilidad', 'compatible')
+    if compatibilidad not in motor.COMPATIBILIDADES:
+        raise ValueError('Compatibilidad no válida.')
     modelo = datos.get('modelo', 'rapido')
     if modelo not in motor.MODELOS:
         raise ValueError('Modelo no válido.')
@@ -152,6 +156,7 @@ def nuevo_trabajo(datos):
         'url': url,
         'formato': formato,
         'calidad': calidad if formato == 'mp4' else None,
+        'compatibilidad': compatibilidad if formato == 'mp4' else None,
         'transcribir': bool(datos.get('transcribir')) and formato == 'mp3',
         'idioma': idioma,
         'modelo': modelo,

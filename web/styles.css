@@ -107,6 +107,31 @@ input[type="url"]::placeholder { color: #8396a1; }
 }
 .segmentos input:focus-visible + span { outline: 3px solid var(--descarga); outline-offset: 2px; }
 
+/* Opciones con explicación (compatibilidad del video) */
+.opciones-lista { display: grid; gap: 0.4rem; }
+.opcion {
+  display: flex;
+  gap: 0.7rem;
+  align-items: flex-start;
+  padding: 0.7rem 0.8rem;
+  border: 2px solid var(--linea);
+  border-radius: var(--radio-control);
+  cursor: pointer;
+}
+.opcion:has(input:checked) { border-color: var(--tinta); }
+.opcion input {
+  width: 1.2rem;
+  height: 1.2rem;
+  margin: 0.15rem 0 0;
+  accent-color: var(--tinta);
+  flex: none;
+}
+.opcion small {
+  display: block;
+  font-size: 0.9rem;
+  color: var(--tinta-suave);
+}
+
 .casilla {
   display: flex;
   align-items: center;
