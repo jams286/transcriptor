@@ -32,7 +32,7 @@ Fuera de esa carpeta sigue aplicando la regla global: no tocar nada más de `/me
 - `motor.py`: descarga (yt-dlp) y transcripción (faster-whisper). Se puede probar suelto: `.venv/bin/python motor.py <URL> mp3 --transcribir --idioma es` (deja todo en `/media/datos/transcriptor/pruebas/`).
 - `servidor.py`: API + cola. Trabajos en `/media/datos/transcriptor/trabajos/<id>/` (`trabajo.json` + archivos).
   - `GET /api/trabajos`, `POST /api/trabajos`, `GET /api/trabajos/<id>`, `DELETE /api/trabajos/<id>`, `GET /api/trabajos/<id>/archivo/<nombre>`.
-- `web/`: página estática (sondea la API cada 1 s si hay trabajos activos, si no cada 15 s).
+- `web/`: página estática (sondea la API cada 1 s si hay trabajos activos, si no cada 15 s). Ícono: `favicon.svg` es el original; los PNG (32, 180 para iPhone, 192/512 para Android) se generaron de él con Pillow.
 - `servicio/transcriptor.service`: unidad systemd de usuario.
 - `cookies.txt` (opcional, fuera de git): si existe, yt-dlp lo usa (Instagram/X).
 
