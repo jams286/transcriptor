@@ -1,5 +1,7 @@
 # transcriptor (personal)
 
+Tracker: transcriptor
+
 Tool solo para Jams: pega una URL de video, elige formato e idioma, y obtiene el archivo y (opcional) su transcripción.
 
 ## Permiso especial: disco JamsData
